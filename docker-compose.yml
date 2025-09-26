@@ -1,0 +1,53 @@
+---
+services:
+  hoppscotch-db:
+    image: postgres:15
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - hoppscotch_db_data:/var/lib/postgresql/data
+    networks:
+      - hoppscotch
+
+  hoppscotch-back:
+    image: hoppscotch/hoppscotch-backend:latest
+    restart: unless-stopped
+    ports:
+      - "3170:3170"
+    env_file:
+      - .env
+    depends_on:
+      - hoppscotch-db
+    networks:
+      - hoppscotch
+
+  hoppscotch-client:
+    image: hoppscotch/hoppscotch-frontend:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - hoppscotch-back
+    networks:
+      - hoppscotch
+
+  hoppscotch-admin:
+    image: hoppscotch/hoppscotch-admin:latest
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    env_file:
+      - .env
+    depends_on:
+      - hoppscotch-back
+    networks:
+      - hoppscotch
+
+networks:
+  hoppscotch:
+
+volumes:
+  hoppscotch_db_data:
